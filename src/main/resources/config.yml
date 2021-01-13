@@ -1,0 +1,6 @@
+MySQLDatabase:
+  host: '172.17.0.1'
+  port: '3306'
+  database: 'CloneWarsBase'
+  username: 'username'
+  password: 'password'

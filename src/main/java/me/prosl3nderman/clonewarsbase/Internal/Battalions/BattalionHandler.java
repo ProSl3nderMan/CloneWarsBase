@@ -3,12 +3,12 @@ package me.prosl3nderman.clonewarsbase.Internal.Battalions;
 import com.google.inject.Injector;
 import me.prosl3nderman.clonewarsbase.CloneWarsBase;
 import me.prosl3nderman.clonewarsbase.Internal.Handler;
-import me.prosl3nderman.clonewarsbase.Internal.Storage.Config;
-import me.prosl3nderman.clonewarsbase.Internal.Storage.ConfigHandler;
+import me.prosl3nderman.clonewarsbase.Internal.APIs.LuckPermsAPI;
+import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.Config;
+import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.ConfigHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Database.MySQLDatabase;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import javax.inject.Inject;
@@ -26,13 +26,15 @@ public class BattalionHandler implements Handler {
     private CloneWarsBase plugin;
     private ConfigHandler configHandler;
     private MySQLDatabase mySQLDatabase;
+    private LuckPermsAPI luckPermsAPI;
 
     @Inject
-    public BattalionHandler(Injector injector, CloneWarsBase plugin, ConfigHandler configHandler, MySQLDatabase mySQLDatabase) {
+    public BattalionHandler(Injector injector, CloneWarsBase plugin, ConfigHandler configHandler, MySQLDatabase mySQLDatabase, LuckPermsAPI luckPermsAPI) {
         this.injector = injector;
         this.plugin = plugin;
         this.configHandler = configHandler;
         this.mySQLDatabase = mySQLDatabase;
+        this.luckPermsAPI = luckPermsAPI;
     }
 
     private HashMap<String, Battalion> battalions = new HashMap<>();
@@ -93,6 +95,11 @@ public class BattalionHandler implements Handler {
         return null;
     }
 
+    public void reloadAllBattalionVariables() {
+        for (Battalion battalion : battalions.values())
+            battalion.loadVariables(battalion.getName());
+    }
+
     public void createBattalion(Player player, String battalionName) {
         if (battalions.containsKey(battalionName)) {
             player.sendMessage(ChatColor.RED + "The battalion " + ChatColor.WHITE + battalionName + ChatColor.RED
@@ -113,7 +120,7 @@ public class BattalionHandler implements Handler {
         loadBattalion(battalionName);
 
         player.sendMessage(ChatColor.GREEN + "The battalion " + ChatColor.WHITE + battalionName + ChatColor.GREEN
-                + "has been created!");
+                + " has been created!");
     }
 
     private List<UUID> deleteBattalionConfirmation = new ArrayList<>();
@@ -125,6 +132,7 @@ public class BattalionHandler implements Handler {
             return;
         }
         if (!deleteBattalionConfirmation.contains(player.getUniqueId())) {
+            deleteBattalionConfirmation.add(player.getUniqueId());
             player.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "WARNING WARNING WARNING WARNING WARNING: ");
             player.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "This is not reversable! If you are sure about this," +
                     "type the command again.");
@@ -145,12 +153,5 @@ public class BattalionHandler implements Handler {
 
         player.sendMessage(ChatColor.GREEN + "The battalion " + ChatColor.WHITE + battalionName + ChatColor.GREEN
                 + " was deleted!");
-    }
-
-    public void playerJoinedBattalion(String battalionName, me.prosl3nderman.clonewarsbase.Internal.Player.Player player) {
-        Battalion battalion = battalions.get(battalionName);
-        battalion.battalionPlayerCameOnline(player);
-        if (!battalionName.equalsIgnoreCase("cr") && !battalionName.equalsIgnoreCase("ct"))
-            mySQLDatabase.addPlayerToBattalion(player, battalionName);
     }
 }

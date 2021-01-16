@@ -1,6 +1,6 @@
 package me.prosl3nderman.clonewarsbase.Events;
 
-import me.prosl3nderman.clonewarsbase.Internal.Player.PlayerHandler;
+import me.prosl3nderman.clonewarsbase.Internal.Clone.CloneHandler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -11,15 +11,15 @@ import javax.inject.Singleton;
 @Singleton
 public class PlayerJoinServerEvent implements Listener {
 
-    private PlayerHandler playerHandler;
+    private CloneHandler cloneHandler;
 
     @Inject
-    public PlayerJoinServerEvent(PlayerHandler playerHandler) {
-        this.playerHandler = playerHandler;
+    public PlayerJoinServerEvent(CloneHandler cloneHandler) {
+        this.cloneHandler = cloneHandler;
     }
 
     @EventHandler
     public void onPlayerJoinServerEvent(PlayerJoinEvent event) {
-        playerHandler.loadPlayer(event.getPlayer());
+        cloneHandler.loadClone(event.getPlayer());
     }
 }

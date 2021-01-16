@@ -1,20 +1,16 @@
 package me.prosl3nderman.clonewarsbase.Internal.Battalions;
 
-import me.prosl3nderman.clonewarsbase.Internal.Storage.ConfigHandler;
-import me.prosl3nderman.clonewarsbase.Internal.Player.Player;
+import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.ConfigHandler;
+import me.prosl3nderman.clonewarsbase.Internal.Clone.Clone;
 import me.prosl3nderman.clonewarsbase.Util.GroupMessage;
-import me.prosl3nderman.clonewarsbase.Util.HexColor;
 import me.prosl3nderman.clonewarsbase.Util.MessageType;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.logging.Level;
 
 public class Battalion {
 
@@ -25,58 +21,82 @@ public class Battalion {
         this.configHandler = configHandler;
     }
 
-    private String battalionName;
-    private String properBattalionName;
+    private String name;
+    private String properName;
     private File cloneSkin;
-    private ChatColor battalionColor;
-    private List<Player> onlinePlayers = new ArrayList<>();
-    private String abbreviatedBattalionName;
+    private ChatColor color;
+    private List<Clone> onlineClones = new ArrayList<>();
+    private String abbreviatedName;
 
     public void loadVariables(String battalionName) {
-        this.battalionName = battalionName;
-        this.properBattalionName = getConfig().getString("properBattalionName");
-        this.battalionColor = ChatColor.of("#" + getConfig().getString("battalionColor"));
-        this.abbreviatedBattalionName = getConfig().getString("abbreviatedBattalionName");
+        this.name = battalionName;
+        this.properName = getConfig().getString("properBattalionName");
+        this.color = ChatColor.of("#" + getConfig().getString("battalionColor"));
+        this.abbreviatedName = getConfig().getString("abbreviatedBattalionName");
+        if (onlineClones.size() != 0)
+            onlineClones.forEach(clone -> clone.updateTags());
     }
 
     private FileConfiguration getConfig() {
-        return configHandler.getConfig(battalionName, "battalions" + File.separator + battalionName).getConfig();
+        return configHandler.getConfig(name, "battalions" + File.separator + name).getConfig();
     }
 
-    public List<Player> getOnlinePlayers() {
-        return onlinePlayers;
+    public List<Clone> getOnlineClones() {
+        return onlineClones;
     }
 
-    public void battalionPlayerCameOnline(Player player) {
-        onlinePlayers.add(player);
-        GroupMessage.sendGroupMessage(battalionColor + "" + ChatColor.BOLD + player.getPlayerName()
-                        + ChatColor.BLUE + "" + ChatColor.BOLD + " has joined.",
-                onlinePlayers, MessageType.BATTALION_JOIN_LEAVE);
+    public void battalionsCloneCameOnline(Clone clone) {
+        onlineClones.add(clone);
+        GroupMessage.sendGroupMessage(color + "" + ChatColor.BOLD + clone.getRank() + " " + clone.getName()
+                        + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " has joined.",
+                onlineClones, MessageType.BATTALION_JOIN_LEAVE);
     }
 
-    public void battalionPlayerWentOffline(Player player) {
-        onlinePlayers.remove(player);
-        GroupMessage.sendGroupMessage(battalionColor + "" + ChatColor.BOLD + player.getPlayerName()
-                        + ChatColor.BLUE + "" + ChatColor.BOLD + " has left.",
-                onlinePlayers, MessageType.BATTALION_JOIN_LEAVE);
+    public void battalionsCloneWentOffline(Clone clone) {
+        onlineClones.remove(clone);
+        GroupMessage.sendGroupMessage(color + "" + ChatColor.BOLD + clone.getRank() + " " + clone.getName()
+                        + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " has left.",
+                onlineClones, MessageType.BATTALION_JOIN_LEAVE);
     }
 
-    public void sendBattalionChatMessage(Player player, String message) {
-        GroupMessage.sendGroupMessage(battalionColor + player.getRankName() + player.getPlayerName() + ChatColor.GOLD + ": "
+    public void sendBattalionCommsMessage(Clone clone, String message) {
+        GroupMessage.sendGroupMessage(clone.getColoredRank() + " " + clone.getName() + ChatColor.GOLD + ": "
                         + ChatColor.GREEN + message,
-                onlinePlayers, MessageType.BATTALION_CHAT);
+                onlineClones, MessageType.BATTALION_CHAT);
     }
 
-    public String getBattalionName() {
-        return battalionName;
+    public void cloneRankedUp(Clone clone, String rank) {
+        if (!onlineClones.contains(clone))
+            onlineClones.add(clone);
+        ChatColor bc = color; ChatColor bo = ChatColor.BOLD; ChatColor wh = ChatColor.WHITE;
+        GroupMessage.sendGroupMessage(bc + "" + bo + "Congrats to " + wh + bo + clone.getName() + bc + bo + " for rank " + wh + bo + rank.toUpperCase() + bc + bo + "!",
+                onlineClones, MessageType.BATTALION_CHAT);
     }
 
-    public String getAbbreviatedBattalionName() {
-        return abbreviatedBattalionName;
+    public void removeCloneFromBattalion(Clone clone, String removalMessage) {
+        ChatColor bo = ChatColor.BOLD;
+        GroupMessage.sendGroupMessage(getColor() + "" + bo + clone.getRank() + " " + clone.getName() + " " + ChatColor.WHITE + ChatColor.BOLD + removalMessage, onlineClones, MessageType.BATTALION_CHAT);
+        onlineClones.remove(clone);
     }
 
-    public ChatColor getBattalionColor() {
-        return battalionColor;
+    public void removeCloneFromBattalion(String clone, String removalMessage) {
+        GroupMessage.sendGroupMessage(getColor() + clone + " " + ChatColor.WHITE + ChatColor.BOLD + removalMessage, onlineClones, MessageType.BATTALION_CHAT);
+    }
+
+    public void silentCloneJoin(Clone clone) {
+        onlineClones.add(clone);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAbbreviatedName() {
+        return abbreviatedName;
+    }
+
+    public ChatColor getColor() {
+        return color;
     }
 
 }

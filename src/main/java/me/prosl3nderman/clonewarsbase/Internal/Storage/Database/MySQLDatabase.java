@@ -4,7 +4,8 @@ import me.prosl3nderman.clonewarsbase.Internal.Battalions.Battalion;
 import me.prosl3nderman.clonewarsbase.Internal.Battalions.BattalionHandler;
 import me.prosl3nderman.clonewarsbase.CloneWarsBase;
 import me.prosl3nderman.clonewarsbase.Internal.Exceptions.NotAsynchronousException;
-import me.prosl3nderman.clonewarsbase.Internal.Player.Player;
+import me.prosl3nderman.clonewarsbase.Internal.Clone.Clone;
+import me.prosl3nderman.clonewarsbase.Internal.Clone.CloneHandler;
 import org.bukkit.Bukkit;
 
 import javax.inject.Inject;
@@ -13,17 +14,20 @@ import javax.inject.Singleton;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Singleton
 public class MySQLDatabase {
 
     private CloneWarsBase plugin;
+    private Provider<CloneHandler> cloneHandler;
     private Provider<BattalionHandler> battalionHandler;
     private MySQLDatabaseDefaults mySQLDatabaseDefaults;
 
     @Inject
-    public MySQLDatabase(CloneWarsBase plugin, Provider<BattalionHandler> battalionHandler, MySQLDatabaseDefaults mySQLDatabaseDefaults) {
+    public MySQLDatabase(CloneWarsBase plugin, Provider<CloneHandler> cloneHandler, Provider<BattalionHandler> battalionHandler, MySQLDatabaseDefaults mySQLDatabaseDefaults) {
         this.plugin = plugin;
+        this.cloneHandler = cloneHandler;
         this.battalionHandler = battalionHandler;
         this.mySQLDatabaseDefaults = mySQLDatabaseDefaults;
     }
@@ -66,12 +70,12 @@ public class MySQLDatabase {
             throw new NotAsynchronousException("Error! This must be ran in an asynchronous thread, but was ran in the main thread.");
     }
 
-    public Battalion getPlayersBattalion(Player player) {
+    public Battalion getPlayersBattalion(String cloneName) { //used when we know the clone is offline.
         checkIfBeingRanOnMainThread();
         try (Connection connection = openConnection()) {
             String getPlayerBattalionQuery = "{CALL getPlayersBattalion(?)}";
             try (CallableStatement preparedStatement = connection.prepareCall(getPlayerBattalionQuery)) {
-                preparedStatement.setString(1, player.getPlayerName());
+                preparedStatement.setString(1, cloneName);
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next())
                         return battalionHandler.get().getBattalion(resultSet.getString("Name"));
@@ -82,17 +86,18 @@ public class MySQLDatabase {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return battalionHandler.get().getBattalion(player.getRank());
+        if (Bukkit.getPlayer(cloneName) != null && Bukkit.getPlayer(cloneName).isOnline())
+            return cloneHandler.get().getClone(Bukkit.getPlayer(cloneName).getUniqueId()).getBattalion();
+        return null;
     }
 
-    public void addPlayerToBattalion(Player player, String battalionName) {
+    public void addPlayerToBattalion(Clone clone, String battalionName) {
         checkIfBeingRanOnMainThread();
         try (Connection connection = openConnection()) {
             String addPlayerToBattalionCall = "{CALL addPlayerToBattalion(?,?)}";
             try (CallableStatement callableStatement = connection.prepareCall(addPlayerToBattalionCall)) {
-                callableStatement.setString(1,player.getPlayerUUID().toString());
-                callableStatement.setString(2,player.getPlayerName());
-                callableStatement.setString(3, battalionName);
+                callableStatement.setString(1, clone.getUUID().toString());
+                callableStatement.setString(2, battalionName);
                 callableStatement.execute();
             }
         } catch (SQLException throwables) {
@@ -102,13 +107,12 @@ public class MySQLDatabase {
         }
     }
 
-    public void removePlayerFromBattalion(String playerName, String battalionName) {
+    public void removePlayerFromBattalion(String playerName) {
         checkIfBeingRanOnMainThread();
         try (Connection connection = openConnection()) {
-            String removePlayerFromBattalionCall = "{CALL removePlayerFromBattalion(?,?)}";
+            String removePlayerFromBattalionCall = "{CALL removePlayerFromBattalion(?)}";
             try (CallableStatement callableStatement = connection.prepareCall(removePlayerFromBattalionCall)) {
                 callableStatement.setString(1,playerName);
-                callableStatement.setString(2,battalionName);
                 callableStatement.execute();
             }
         } catch (SQLException throwables) {
@@ -118,13 +122,13 @@ public class MySQLDatabase {
         }
     }
 
-    public Integer updatePlayerInformationAndGetPlayerID(Player player) {
+    public Integer updatePlayerInformationAndGetPlayerID(Clone clone) {
         checkIfBeingRanOnMainThread();
         try (Connection connection = openConnection()) {
             String updatePlayerInformationQuery = "{CALL updatePlayerIGNAndReturnID(?,?)}";
             try (CallableStatement callableStatement = connection.prepareCall(updatePlayerInformationQuery)) {
-                callableStatement.setString(1, player.getPlayerUUID().toString());
-                callableStatement.setString(2, player.getPlayerName());
+                callableStatement.setString(1, clone.getUUID().toString());
+                callableStatement.setString(2, clone.getName());
 
                 try (ResultSet resultSet = callableStatement.executeQuery()) {
                     if (resultSet.next())
@@ -187,5 +191,64 @@ public class MySQLDatabase {
             e.printStackTrace();
         }
         return battalionNamesList;
+    }
+
+    public List<String> getAllBattalionCloneIGNs(String battalionName) {
+        checkIfBeingRanOnMainThread();
+        List<String> battalionCloneIGNs = new ArrayList<>();
+        try (Connection connection = openConnection()) {
+            String getAllBattalionsQuery = "{CALL getPlayerIGNsOfBattalion(?)}";
+            try (CallableStatement callableStatement = connection.prepareCall(getAllBattalionsQuery)) {
+                callableStatement.setString(1, battalionName);
+                try (ResultSet resultSet = callableStatement.executeQuery()) {
+                    while (resultSet.next())
+                        battalionCloneIGNs.add(resultSet.getString("IGN"));
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return battalionCloneIGNs;
+    }
+
+    public List<UUID> getAllBattalionCloneUUIDs(String battalionName) {
+        checkIfBeingRanOnMainThread();
+        List<UUID> battalionCloneUUIDs = new ArrayList<>();
+        try (Connection connection = openConnection()) {
+            String getAllBattalionsQuery = "{CALL getPlayerUUIDsOfBattalion(?)}";
+            try (CallableStatement callableStatement = connection.prepareCall(getAllBattalionsQuery)) {
+                callableStatement.setString(1, battalionName);
+                try (ResultSet resultSet = callableStatement.executeQuery()) {
+                    while (resultSet.next())
+                        battalionCloneUUIDs.add(UUID.fromString(resultSet.getString("UUID")));
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return battalionCloneUUIDs;
+    }
+
+    public UUID getPlayerUUIDFromIGN(String playerIGN) {
+        checkIfBeingRanOnMainThread();
+        try (Connection connection = openConnection()) {
+            String getAllBattalionsQuery = "{CALL getPlayerUUIDFromIGN(?)}";
+            try (CallableStatement callableStatement = connection.prepareCall(getAllBattalionsQuery)) {
+                callableStatement.setString(1, playerIGN);
+                try (ResultSet resultSet = callableStatement.executeQuery()) {
+                    if (resultSet.next())
+                        return UUID.fromString(resultSet.getString("UUID"));
+                }
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

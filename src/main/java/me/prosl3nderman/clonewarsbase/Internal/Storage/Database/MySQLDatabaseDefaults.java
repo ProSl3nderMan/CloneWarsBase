@@ -64,12 +64,10 @@ public class MySQLDatabaseDefaults {
                         "values((select ID from Players where UUID=pUUID), (select ID from Battalions where Name=bName)); " +
                 "end");
         defaultProcedureCreationQueries.add("DROP PROCEDURE IF EXISTS removePlayerFromBattalion");
-        defaultProcedureCreationQueries.add("CREATE PROCEDURE removePlayerFromBattalion(IN pIGN varchar(20), IN bName varchar(32))" +
+        defaultProcedureCreationQueries.add("CREATE PROCEDURE removePlayerFromBattalion(IN pIGN varchar(20))" +
                 "begin " +
                 "delete from PlayerBattalionRelations " +
-                        "where PlayerID_FK = (select ID from PlayerIGNs where IGN=pIGN) " +
-                        "and " +
-                        "BattalionID_FK = (select ID from Battalions where Name=bName); " +
+                        "where PlayerID_FK = (select ID from PlayerIGNs where IGN=pIGN); " +
                 "end");
         defaultProcedureCreationQueries.add("DROP PROCEDURE IF EXISTS createBattalion");
         defaultProcedureCreationQueries.add("CREATE PROCEDURE createBattalion(IN bName varchar(32))" +
@@ -106,6 +104,25 @@ public class MySQLDatabaseDefaults {
         defaultProcedureCreationQueries.add("CREATE PROCEDURE getListOfBattalions()" +
                 "begin " +
                 "select Name from Battalions; " +
+                "end");
+        defaultProcedureCreationQueries.add("DROP PROCEDURE IF EXISTS getPlayerIGNsOfBattalion");
+        defaultProcedureCreationQueries.add("CREATE PROCEDURE getPlayerIGNsOfBattalion(IN bNAme varchar(32))" +
+                "begin " +
+                "SELECT IGN FROM PlayerIGNs " +
+                "INNER JOIN PlayerBattalionRelations ON PlayerIGNs.ID = PlayerBattalionRelations.PlayerID_FK " +
+                "AND PlayerBattalionRelations.BattalionID_FK=(SELECT Battalions.ID FROM Battalions WHERE Battalions.Name=bName); " +
+                "end");
+        defaultProcedureCreationQueries.add("DROP PROCEDURE IF EXISTS getPlayerUUIDsOfBattalion");
+        defaultProcedureCreationQueries.add("CREATE PROCEDURE getPlayerUUIDsOfBattalion(IN bNAme varchar(32))" +
+                "begin " +
+                "SELECT UUID FROM Players " +
+                "INNER JOIN PlayerBattalionRelations ON Players.ID = PlayerBattalionRelations.PlayerID_FK " +
+                "AND PlayerBattalionRelations.BattalionID_FK=(SELECT Battalions.ID FROM Battalions WHERE Battalions.Name=bName); " +
+                "end");
+        defaultProcedureCreationQueries.add("DROP PROCEDURE IF EXISTS getPlayerUUIDFromIGN");
+        defaultProcedureCreationQueries.add("CREATE PROCEDURE getPlayerUUIDFromIGN(IN pIGN varchar(20))" +
+                "begin " +
+                "select UUID from Players where ID=(select ID from PlayerIGNs where IGN=pIGN); " +
                 "end");
         return defaultProcedureCreationQueries;
     }

@@ -1,13 +1,15 @@
 package me.prosl3nderman.clonewarsbase;
 
 import com.google.inject.Injector;
+import me.prosl3nderman.clonewarsbase.Commands.BattalionCommand;
+import me.prosl3nderman.clonewarsbase.Events.MenuClickEvent;
 import me.prosl3nderman.clonewarsbase.Events.PlayerJoinServerEvent;
 import me.prosl3nderman.clonewarsbase.Events.PlayerLeaveServerEvent;
 import me.prosl3nderman.clonewarsbase.Internal.Battalions.BattalionHandler;
 import me.prosl3nderman.clonewarsbase.Commands.CWBCommand;
 import me.prosl3nderman.clonewarsbase.Internal.Handler;
-import me.prosl3nderman.clonewarsbase.Internal.Storage.ConfigHandler;
-import me.prosl3nderman.clonewarsbase.Internal.Player.PlayerHandler;
+import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.ConfigHandler;
+import me.prosl3nderman.clonewarsbase.Internal.Clone.CloneHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Database.MySQLDatabase;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
@@ -28,7 +30,7 @@ public final class CloneWarsBase extends JavaPlugin {
     private Injector injector;
 
     @Inject
-    private PlayerHandler playerHandler;
+    private CloneHandler cloneHandler;
     @Inject
     private ConfigHandler configHandler;
     @Inject
@@ -85,15 +87,17 @@ public final class CloneWarsBase extends JavaPlugin {
 
     private void registerCommands() {
         getCommand("CWB").setExecutor(injector.getInstance(CWBCommand.class));
+        getCommand("batt").setExecutor(injector.getInstance(BattalionCommand.class));
     }
 
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(injector.getInstance(PlayerJoinServerEvent.class), this);
         getServer().getPluginManager().registerEvents(injector.getInstance(PlayerLeaveServerEvent.class), this);
+        getServer().getPluginManager().registerEvents(injector.getInstance(MenuClickEvent.class), this);
     }
 
     private void enableHandlers() {
-        allHandlers.addAll(Arrays.asList(playerHandler, configHandler, battalionHandler));
+        allHandlers.addAll(Arrays.asList(cloneHandler, configHandler, battalionHandler));
         for (Handler handler : allHandlers)
             handler.enable();
     }
@@ -104,7 +108,7 @@ public final class CloneWarsBase extends JavaPlugin {
                 @Override
                 public void run() {
                     for (Player player : Bukkit.getOnlinePlayers())
-                        playerHandler.loadPlayer(player);
+                        cloneHandler.loadClone(player);
                 }
             }, 40L);
         }

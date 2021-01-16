@@ -1,7 +1,8 @@
-package me.prosl3nderman.clonewarsbase.Internal.Storage;
+package me.prosl3nderman.clonewarsbase.Internal.Storage.Configs;
 
 import me.prosl3nderman.clonewarsbase.CloneWarsBase;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -87,12 +88,16 @@ public class Config {
         Reader defConfigStream = null;
         try {
             defConfigStream = new InputStreamReader(plugin.getResource(otherConfig), "UTF-8");
+            try {
+                customConfig.load(defConfigStream);
+                customConfig.save(customConfigFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InvalidConfigurationException e) {
+                e.printStackTrace();
+            }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
-        }
-        if (defConfigStream != null) {
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-            customConfig.setDefaults(defConfig);
         }
     }
 }

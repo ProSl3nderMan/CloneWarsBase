@@ -111,6 +111,7 @@ public class CWBCommand implements CommandExecutor {
         player.sendMessage(lineSpacer + helpTitleColors + " Administrating Commands " + lineSpacer);
         player.sendMessage(commandStarter + "batt create <battalion name>" + commandAndDescriptionSpacer + "Used to create a battalion. Auto generates the config file with default values.");
         player.sendMessage(commandStarter + "batt delete <battalion name>" + commandAndDescriptionSpacer + "Used to delete a battalion.");
+        player.sendMessage(commandStarter + "batt setspawn <battalion name>" + commandAndDescriptionSpacer + "Used to set the spawnpoint of a battalion.");
         player.sendMessage(commandStarter + "batt forceJoin <battalion name> [rank]" + commandAndDescriptionSpacer + "Used to force join a battalion.");
         player.sendMessage(commandStarter + "batt list" + commandAndDescriptionSpacer + "Used to list all created battalions.");
         player.sendMessage(commandStarter + "rankup <cr name>" + commandAndDescriptionSpacer + "Used to promote a cr to a ct.");
@@ -187,12 +188,19 @@ public class CWBCommand implements CommandExecutor {
             return;
         }
 
+        Battalion battalion = battalionHandler.getBattalion(battalionName);
+        if (battalion == null) {
+            player.sendMessage(rd + "Error! The battalion " + wh + battalionName + rd + " does not exist! Do " + wh + "/cwb batt list" + rd + " for a list of battalions!");
+            return;
+        }
+
+        if (batSubcommand.equalsIgnoreCase("setspawn")) {
+            battalion.setSpawnPoint(player.getLocation());
+            player.sendMessage(ChatColor.GREEN + "The battalion " + wh + battalionName + ChatColor.GREEN + " spawnpoint has been set to your location!");
+            return;
+        }
+
         if (batSubcommand.equalsIgnoreCase("forceJoin")) {
-            Battalion battalion = battalionHandler.getBattalion(battalionName);
-            if (battalion == null) {
-                player.sendMessage(rd + "Error! The battalion " + wh + battalionName + rd + " does not exist! Do " + wh + "/cwb batt list" + rd + " for a list of battalions!");
-                return;
-            }
             String rank = args.length > 3 ? args[3] : "pvt";
             Clone clone = cloneHandler.getClone(player.getUniqueId());
             clone.acceptedInvitationToBattalion(battalion);

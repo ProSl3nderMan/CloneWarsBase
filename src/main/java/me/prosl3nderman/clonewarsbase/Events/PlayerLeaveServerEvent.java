@@ -1,5 +1,6 @@
 package me.prosl3nderman.clonewarsbase.Events;
 
+import me.prosl3nderman.clonewarsbase.Internal.Clone.Clone;
 import me.prosl3nderman.clonewarsbase.Internal.Clone.CloneHandler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +21,6 @@ public class PlayerLeaveServerEvent implements Listener {
 
     @EventHandler
     public void onPlayerLeaveServer(PlayerQuitEvent event) {
-        cloneHandler.getClone(event.getPlayer().getUniqueId()).cloneWentOffline();
+        cloneHandler.getClone(event.getPlayer().getUniqueId()).wentOffline();
     }
 }

@@ -4,6 +4,7 @@ import me.prosl3nderman.clonewarsbase.Internal.Clone.CloneHandler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -21,5 +22,10 @@ public class PlayerJoinServerEvent implements Listener {
     @EventHandler
     public void onPlayerJoinServerEvent(PlayerJoinEvent event) {
         cloneHandler.loadClone(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerSpawnEvent(PlayerSpawnLocationEvent event) {
+        event.setSpawnLocation(cloneHandler.getClone(event.getPlayer().getUniqueId()).getBattalion().getSpawnPoint());
     }
 }

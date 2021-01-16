@@ -1,10 +1,14 @@
 package me.prosl3nderman.clonewarsbase.Internal.Battalions;
 
+import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.Config;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.ConfigHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Clone.Clone;
+import me.prosl3nderman.clonewarsbase.Internal.Wrappers.ProLocation;
 import me.prosl3nderman.clonewarsbase.Util.GroupMessage;
+import me.prosl3nderman.clonewarsbase.Util.LocationStringConverter;
 import me.prosl3nderman.clonewarsbase.Util.MessageType;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import javax.inject.Inject;
@@ -27,18 +31,23 @@ public class Battalion {
     private ChatColor color;
     private List<Clone> onlineClones = new ArrayList<>();
     private String abbreviatedName;
+    private ProLocation spawnLocation;
 
     public void loadVariables(String battalionName) {
         this.name = battalionName;
         this.properName = getConfig().getString("properBattalionName");
         this.color = ChatColor.of("#" + getConfig().getString("battalionColor"));
         this.abbreviatedName = getConfig().getString("abbreviatedBattalionName");
+        this.spawnLocation = new ProLocation(LocationStringConverter.getLocationFromString(getConfig().getString("spawnpoint"), true));
         if (onlineClones.size() != 0)
             onlineClones.forEach(clone -> clone.updateTags());
     }
 
     private FileConfiguration getConfig() {
         return configHandler.getConfig(name, "battalions" + File.separator + name).getConfig();
+    }
+    private Config getConfigFile() {
+        return configHandler.getConfig(name, "battalions" + File.separator + name);
     }
 
     public List<Clone> getOnlineClones() {
@@ -97,6 +106,15 @@ public class Battalion {
 
     public ChatColor getColor() {
         return color;
+    }
+
+    public Location getSpawnPoint() {
+        return spawnLocation.getLocation();
+    }
+    public void setSpawnPoint(Location location) {
+        getConfig().set("spawnpoint", LocationStringConverter.getStringFromLocation(location, true));
+        getConfigFile().srConfig();
+        spawnLocation = new ProLocation(location);
     }
 
 }

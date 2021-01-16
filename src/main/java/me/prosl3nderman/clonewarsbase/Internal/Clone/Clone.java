@@ -76,7 +76,7 @@ public class Clone {
         });
     }
 
-    public void cloneWentOffline() {
+    public void wentOffline() {
         battalion.battalionsCloneWentOffline(this);
         battalionInvites.clear();
         player = null;

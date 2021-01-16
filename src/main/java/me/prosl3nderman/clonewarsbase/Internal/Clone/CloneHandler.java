@@ -51,7 +51,11 @@ public class CloneHandler implements Handler {
 
     public Clone getClone(UUID playerUUID) {
         return clones.containsKey(playerUUID) ? clones.get(playerUUID) : null;
+    }
 
+    public void cloneWentOffline(UUID playerUUID) {
+        if (clones.containsKey(playerUUID))
+            clones.remove(playerUUID);
     }
 
     public void cloneRankup(String cloneName, String rank) {

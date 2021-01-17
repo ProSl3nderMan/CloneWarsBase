@@ -13,10 +13,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.inventivetalent.customskins.CustomSkins;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.time.LocalDateTime;
+import java.io.File;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Level;
@@ -75,7 +77,7 @@ public class CWBCommand implements CommandExecutor {
         }
 
         if (!playerSender.hasPermission("CWB.Testing")) {
-            playerSender.sendMessage(ChatColor.RED + "You do not have testing permissions to do this command!");
+            playerSender.sendMessage(ChatColor.RED + "Error, the subcommand " + wh + subcommand + rd + " does not exist.");
             return true;
         }
 
@@ -89,8 +91,24 @@ public class CWBCommand implements CommandExecutor {
             return true;
         }
 
+        if (subcommand.equalsIgnoreCase("reloadSkins")) {
+            battalionHandler.goThroughBattalionDirectoryAndLoadBattalions(new File(plugin.getDataFolder() + File.separator + "battalions"), true, true);
+            playerSender.sendMessage(ChatColor.GREEN + "All skin files are currently being reloaded. This can take a while, and you won't receive a message in game saying it's done.");
+            playerSender.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + "BTW: Players will have to re-connect to see their own skins updated.");
+            return true;
+        }
+
         if (subcommand.equalsIgnoreCase("getServerTimezone")) {
             Bukkit.getLogger().log(Level.INFO, TimeZone.getDefault().getDisplayName());
+            return true;
+        }
+
+        if (subcommand.equalsIgnoreCase("testSkin")) {
+            CustomSkins customSkins = JavaPlugin.getPlugin(CustomSkins.class);
+            String fs = File.separator;
+            customSkins.createSkin("cr", new File(plugin.getDataFolder() + fs + "battalions" + fs + "cr" + fs, "cr.png"), "private", "steve", true);
+            customSkins.applySkin("cr", playerSender.getName());
+            playerSender.sendMessage(ChatColor.GREEN + "Skin set to cr! - ProSl3nderMan");
             return true;
         }
 

@@ -2,6 +2,7 @@ package me.prosl3nderman.clonewarsbase.Internal.Battalions;
 
 import com.google.inject.Injector;
 import me.prosl3nderman.clonewarsbase.CloneWarsBase;
+import me.prosl3nderman.clonewarsbase.Internal.APIs.SkinAPI;
 import me.prosl3nderman.clonewarsbase.Internal.Handler;
 import me.prosl3nderman.clonewarsbase.Internal.APIs.LuckPermsAPI;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.Config;
@@ -26,15 +27,15 @@ public class BattalionHandler implements Handler {
     private CloneWarsBase plugin;
     private ConfigHandler configHandler;
     private MySQLDatabase mySQLDatabase;
-    private LuckPermsAPI luckPermsAPI;
+    private SkinAPI skinAPI;
 
     @Inject
-    public BattalionHandler(Injector injector, CloneWarsBase plugin, ConfigHandler configHandler, MySQLDatabase mySQLDatabase, LuckPermsAPI luckPermsAPI) {
+    public BattalionHandler(Injector injector, CloneWarsBase plugin, ConfigHandler configHandler, MySQLDatabase mySQLDatabase, SkinAPI skinAPI) {
         this.injector = injector;
         this.plugin = plugin;
         this.configHandler = configHandler;
         this.mySQLDatabase = mySQLDatabase;
-        this.luckPermsAPI = luckPermsAPI;
+        this.skinAPI = skinAPI;
     }
 
     private HashMap<String, Battalion> battalions = new HashMap<>();
@@ -42,29 +43,30 @@ public class BattalionHandler implements Handler {
     @Override
     public void enable() {
         ensureDefaultBattalionFilesAreSavedInServerFiles();
-        goThroughBattalionDirectoryAndLoadBattalions(new File(plugin.getDataFolder() + File.separator + "battalions"));
+        goThroughBattalionDirectoryAndLoadBattalions(new File(plugin.getDataFolder() + File.separator + "battalions"), false, false);
     }
 
-    private void goThroughBattalionDirectoryAndLoadBattalions(File dir) {
+    public void goThroughBattalionDirectoryAndLoadBattalions(File dir, Boolean loadOnlySkins, Boolean reloadAllSkins) {
         for (File file : dir.listFiles()) {
             if (file.isFile() && file.getName().contains("config.yml"))
                 continue;
             if (file.isDirectory())
-                goThroughBattalionDirectoryAndLoadBattalions(file);
+                goThroughBattalionDirectoryAndLoadBattalions(file, loadOnlySkins, reloadAllSkins);
             else {
-                if (file.getName().contains(".yml")) {
+                if (file.getName().contains(".yml") && !loadOnlySkins) {
                     String battalionName = file.getName().replace(".yml", "");
                     loadBattalion(battalionName);
-                }
+                } else if (file.getName().contains(".png"))
+                        skinAPI.loadSkin(file.getParentFile().getName(), file.getName().replace(".png", ""), file, reloadAllSkins);
             }
         }
     }
 
     private void ensureDefaultBattalionFilesAreSavedInServerFiles() {
         plugin.saveResource("battalions" + File.separator + "cr" + File.separator + "cr.yml", false);
-        plugin.saveResource("battalions" + File.separator + "cr" + File.separator + "clone recruit.png", false);
+        plugin.saveResource("battalions" + File.separator + "cr" + File.separator + "cr.png", false);
         plugin.saveResource("battalions" + File.separator + "ct" + File.separator + "ct.yml", false);
-        plugin.saveResource("battalions" + File.separator + "ct" + File.separator + "clone trooper.png", false);
+        plugin.saveResource("battalions" + File.separator + "ct" + File.separator + "ct.png", false);
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {

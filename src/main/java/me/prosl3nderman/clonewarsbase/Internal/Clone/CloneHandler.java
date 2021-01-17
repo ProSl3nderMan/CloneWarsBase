@@ -42,11 +42,13 @@ public class CloneHandler implements Handler {
         clones.clear();
     }
 
-    public void loadClone(Player player) {
-        Clone CWClone = injector.getInstance(Clone.class);
-        CWClone.loadPlayerVariables(player);
+    public Clone loadClone(Player player) {
+        Clone clone = injector.getInstance(Clone.class);
+        clone.loadPlayerVariables(player);
 
-        clones.put(player.getUniqueId(), CWClone);
+        clones.put(player.getUniqueId(), clone);
+
+        return clone;
     }
 
     public Clone getClone(UUID playerUUID) {

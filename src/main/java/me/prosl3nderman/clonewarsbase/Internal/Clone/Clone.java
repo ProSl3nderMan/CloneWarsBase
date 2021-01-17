@@ -1,5 +1,6 @@
 package me.prosl3nderman.clonewarsbase.Internal.Clone;
 
+import me.prosl3nderman.clonewarsbase.Internal.APIs.SkinAPI;
 import me.prosl3nderman.clonewarsbase.Internal.Battalions.Battalion;
 import me.prosl3nderman.clonewarsbase.CloneWarsBase;
 import me.prosl3nderman.clonewarsbase.Internal.APIs.LuckPermsAPI;
@@ -7,7 +8,6 @@ import me.prosl3nderman.clonewarsbase.Internal.Battalions.BattalionHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Database.MySQLDatabase;
 import me.prosl3nderman.clonewarsbase.Internal.APIs.TabAPI;
 import me.prosl3nderman.clonewarsbase.Util.ChatMode;
-import me.prosl3nderman.clonewarsbase.Util.MessageType;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -28,14 +28,16 @@ public class Clone {
     private MySQLDatabase mySQLDatabase;
     private TabAPI tabAPI;
     private BattalionHandler battalionHandler;
+    private SkinAPI skinAPI;
 
     @Inject
-    public Clone(CloneWarsBase plugin, LuckPermsAPI luckPermsAPI, MySQLDatabase mySQLDatabase, TabAPI tabAPI, BattalionHandler battalionHandler) {
+    public Clone(CloneWarsBase plugin, LuckPermsAPI luckPermsAPI, MySQLDatabase mySQLDatabase, TabAPI tabAPI, BattalionHandler battalionHandler, SkinAPI skinAPI) {
         this.plugin = plugin;
         this.luckPermsAPI = luckPermsAPI;
         this.mySQLDatabase = mySQLDatabase;
         this.tabAPI = tabAPI;
         this.battalionHandler = battalionHandler;
+        this.skinAPI = skinAPI;
     }
 
     private UUID UUID;
@@ -114,6 +116,7 @@ public class Clone {
     public void updateRank(String rank) {
         this.rank = rank;
         updateTags();
+        skinAPI.applyCloneSkin(getPlayer(), battalion, rank);
     }
 
     public void updateTags() {
@@ -165,8 +168,7 @@ public class Clone {
     public void leftBattalion() {
         battalion = battalionHandler.getBattalion("ct");
         battalion.silentCloneJoin(this);
-        rank = "ct";
-        updateTags();
+        updateRank("ct");
         Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {

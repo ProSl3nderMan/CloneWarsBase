@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.inventivetalent.customskins.CustomSkins;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -26,6 +27,7 @@ import java.util.List;
 public final class CloneWarsBase extends JavaPlugin {
 
     private LuckPerms lpAPI = null;
+    private CustomSkins customSkinsAPI = null;
 
     private Injector injector;
 
@@ -44,6 +46,9 @@ public final class CloneWarsBase extends JavaPlugin {
     public void onEnable() {
         // setup luck perms before Guice Modules because luck perms is injected into the module.
         setupLuckPermsAPI();
+
+        // setup Custom Skins before Guice modules
+        setupCustomSkinsAPI();
 
         // register GUICE and bind all instances to the appropriate instance.
         registerGuiceModules();
@@ -79,8 +84,12 @@ public final class CloneWarsBase extends JavaPlugin {
             lpAPI = provider.getProvider();
     }
 
+    private void setupCustomSkinsAPI() {
+        customSkinsAPI = getPlugin(CustomSkins.class);
+    }
+
     private void registerGuiceModules() {
-        CloneWarsBaseModule module = new CloneWarsBaseModule(this, lpAPI);
+        CloneWarsBaseModule module = new CloneWarsBaseModule(this, lpAPI, customSkinsAPI);
         injector = module.createInjector();
         injector.injectMembers(this);
     }

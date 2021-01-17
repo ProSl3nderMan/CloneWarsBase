@@ -3,7 +3,7 @@ version: ${project.version}
 main: me.prosl3nderman.clonewarsbase.CloneWarsBase
 api-version: 1.16
 authors: [ ProSl3nderMan ]
-depend: [LuckPerms,TAB]
+depend: [LuckPerms,TAB,CustomSkins,NickNamer]
 commands:
   CWB:
     description: CWB Admin command for testing and administrating purposes.

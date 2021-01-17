@@ -22,5 +22,6 @@ public class PlayerLeaveServerEvent implements Listener {
     @EventHandler
     public void onPlayerLeaveServer(PlayerQuitEvent event) {
         cloneHandler.getClone(event.getPlayer().getUniqueId()).wentOffline();
+        cloneHandler.cloneWentOffline(event.getPlayer().getUniqueId());
     }
 }

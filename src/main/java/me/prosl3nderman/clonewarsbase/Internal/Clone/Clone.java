@@ -7,7 +7,7 @@ import me.prosl3nderman.clonewarsbase.Internal.APIs.LuckPermsAPI;
 import me.prosl3nderman.clonewarsbase.Internal.Battalions.BattalionHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Database.MySQLDatabase;
 import me.prosl3nderman.clonewarsbase.Internal.APIs.TabAPI;
-import me.prosl3nderman.clonewarsbase.Util.ChatMode;
+import me.prosl3nderman.clonewarsbase.Internal.Chat.ChatMode;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -193,5 +193,9 @@ public class Clone {
             chatMode = ChatMode.LOCAL;
             sendMessage(ChatColor.DARK_GREEN + "Battalion communications has been toggled " + ChatColor.RED + "off" + ChatColor.DARK_GREEN + "!");
         }
+    }
+
+    public ChatMode getChatMode() {
+        return chatMode;
     }
 }

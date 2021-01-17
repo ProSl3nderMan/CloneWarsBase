@@ -4,3 +4,11 @@ MySQLDatabase:
   database: 'CloneWarsBase'
   username: 'username'
   password: 'password'
+chatShortcuts:
+  ooc: ''
+  staff: ''
+  officer: ''
+  server: ''
+  batt: ''
+  broadcast: ''
+  local: ''

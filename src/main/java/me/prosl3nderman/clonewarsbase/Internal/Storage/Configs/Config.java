@@ -76,9 +76,9 @@ public class Config {
             customConfigFile = new File(dir, configName + ".yml");
         if (customConfigFile.exists()) {
             customConfigFile.delete();
-            Bukkit.getLogger().log(Level.INFO, "[NovscraftPvP] The file /novscraftpvp/maps/" + configName + ".yml has been deleted.");
+            Bukkit.getLogger().log(Level.INFO, configName + ".yml has been deleted.");
         } else
-            Bukkit.getLogger().log(Level.WARNING, "[NovscraftPvP] Error! No file /novscraftpvp/maps/" + configName + ".yml, skipping deletion.");
+            Bukkit.getLogger().log(Level.WARNING, configName + ".yml, skipping deletion.");
     }
 
     public void replicateOtherConfig(String otherConfig) {

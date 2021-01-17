@@ -4,9 +4,9 @@ import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.Config;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.ConfigHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Clone.Clone;
 import me.prosl3nderman.clonewarsbase.Internal.Wrappers.ProLocation;
-import me.prosl3nderman.clonewarsbase.Util.GroupMessage;
+import me.prosl3nderman.clonewarsbase.Internal.Chat.GroupMessage;
 import me.prosl3nderman.clonewarsbase.Util.LocationStringConverter;
-import me.prosl3nderman.clonewarsbase.Util.MessageType;
+import me.prosl3nderman.clonewarsbase.Internal.Chat.MessageType;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -56,20 +56,20 @@ public class Battalion {
 
     public void battalionsCloneCameOnline(Clone clone) {
         onlineClones.add(clone);
-        GroupMessage.sendGroupMessage(color + "" + ChatColor.BOLD + clone.getRank() + " " + clone.getName()
+        GroupMessage.sendCloneGroupMessage(color + "" + ChatColor.BOLD + clone.getRank() + " " + clone.getName()
                         + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " has joined.",
                 onlineClones, MessageType.BATTALION_JOIN_LEAVE);
     }
 
     public void battalionsCloneWentOffline(Clone clone) {
         onlineClones.remove(clone);
-        GroupMessage.sendGroupMessage(color + "" + ChatColor.BOLD + clone.getRank() + " " + clone.getName()
+        GroupMessage.sendCloneGroupMessage(color + "" + ChatColor.BOLD + clone.getRank() + " " + clone.getName()
                         + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " has left.",
                 onlineClones, MessageType.BATTALION_JOIN_LEAVE);
     }
 
     public void sendBattalionCommsMessage(Clone clone, String message) {
-        GroupMessage.sendGroupMessage(clone.getColoredRank() + " " + clone.getName() + ChatColor.GOLD + ": "
+        GroupMessage.sendCloneGroupMessage(ChatColor.DARK_BLUE + "[BATT COMMS] " + clone.getColoredRank() + " " + clone.getName() + ChatColor.GOLD + ": "
                         + ChatColor.GREEN + message,
                 onlineClones, MessageType.BATTALION_CHAT);
     }
@@ -78,18 +78,18 @@ public class Battalion {
         if (!onlineClones.contains(clone))
             onlineClones.add(clone);
         ChatColor bc = color; ChatColor bo = ChatColor.BOLD; ChatColor wh = ChatColor.WHITE;
-        GroupMessage.sendGroupMessage(bc + "" + bo + "Congrats to " + wh + bo + clone.getName() + bc + bo + " for rank " + wh + bo + rank.toUpperCase() + bc + bo + "!",
+        GroupMessage.sendCloneGroupMessage(bc + "" + bo + "Congrats to " + wh + bo + clone.getName() + bc + bo + " for rank " + wh + bo + rank.toUpperCase() + bc + bo + "!",
                 onlineClones, MessageType.BATTALION_CHAT);
     }
 
     public void removeCloneFromBattalion(Clone clone, String removalMessage) {
         ChatColor bo = ChatColor.BOLD;
-        GroupMessage.sendGroupMessage(getColor() + "" + bo + clone.getRank() + " " + clone.getName() + " " + ChatColor.WHITE + ChatColor.BOLD + removalMessage, onlineClones, MessageType.BATTALION_CHAT);
+        GroupMessage.sendCloneGroupMessage(getColor() + "" + bo + clone.getRank() + " " + clone.getName() + " " + ChatColor.WHITE + ChatColor.BOLD + removalMessage, onlineClones, MessageType.BATTALION_CHAT);
         onlineClones.remove(clone);
     }
 
     public void removeCloneFromBattalion(String clone, String removalMessage) {
-        GroupMessage.sendGroupMessage(getColor() + clone + " " + ChatColor.WHITE + ChatColor.BOLD + removalMessage, onlineClones, MessageType.BATTALION_CHAT);
+        GroupMessage.sendCloneGroupMessage(getColor() + clone + " " + ChatColor.WHITE + ChatColor.BOLD + removalMessage, onlineClones, MessageType.BATTALION_CHAT);
     }
 
     public void silentCloneJoin(Clone clone) {
@@ -115,6 +115,10 @@ public class Battalion {
         getConfig().set("spawnpoint", LocationStringConverter.getStringFromLocation(location, true));
         getConfigFile().srConfig();
         spawnLocation = new ProLocation(location);
+    }
+
+    public String getColoredAbbreviatedName() {
+        return color + abbreviatedName.toUpperCase();
     }
 
 }

@@ -15,6 +15,7 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 @Singleton
 public class ChatHandler implements Handler {
@@ -28,14 +29,16 @@ public class ChatHandler implements Handler {
         this.cloneHandler = cloneHandler;
     }
 
-
-    private HashMap<Character, ChatMode> chatShortcuts = new HashMap<>();
+    private HashMap<ChatMode, String> chatModePrefixs = new HashMap<>();
+    private HashMap<ChatMode, String> chatModePermissions = new HashMap<>();
 
     @Override
     public void enable() {
-        chatShortcuts.put(plugin.getConfig().getString("chatShortcuts.ooc").charAt(0), ChatMode.OUT_OF_CHARACTER);
-        chatShortcuts.put(plugin.getConfig().getString("chatShortcuts.staff").charAt(0), ChatMode.STAFF);
-        chatShortcuts.put(plugin.getConfig().getString("chatShortcuts.officer").charAt(0), ChatMode.OFFICER);
+        for (ChatMode chatMode : ChatMode.values()) {
+            String pathToChatMode = "chat." + chatMode.name().toLowerCase() + ".";
+            chatModePrefixs.put(chatMode, ChatColor.translateAlternateColorCodes('&',plugin.getConfig().getString(pathToChatMode + "prefix")));
+            chatModePermissions.put(chatMode, plugin.getConfig().getString(pathToChatMode + "permission"));
+        }
     }
 
     @Override
@@ -43,50 +46,40 @@ public class ChatHandler implements Handler {
 
     }
 
-    public void onAsyncChatEvent(AsyncPlayerChatEvent e) {
-        e.setCancelled(true);
-
-        Clone clone = cloneHandler.getClone(e.getPlayer().getUniqueId());
+    public void handleChatMessage(UUID playerUUID, String message) {
+        Clone clone = cloneHandler.getClone(playerUUID);
         ChatMode chatMode = clone.getChatMode();
 
-        String nameAndMessage = clone.getBattalion().getColoredAbbreviatedName() + " " + clone.getColoredRank() + " " + clone.getName() + ChatColor.WHITE + ": " + e.getMessage();
+        handleChatMessage(clone, message, chatMode);
+    }
 
-
+    public void handleChatMessage(Clone clone, String message, ChatMode chatMode) {
+        String wholeMessage = chatModePrefixs.get(chatMode) + " " + clone.getBattalion().getColoredAbbreviatedName() + " " + clone.getColoredRank() + " " + clone.getName() + ChatColor.WHITE + ": " + message;
 
         if (chatMode == ChatMode.LOCAL)
-            sendLocalMessage(nameAndMessage, clone);
+            sendMessage(wholeMessage, getLocalPlayers(clone.getPlayer().getLocation()), chatMode);
         else if (chatMode == ChatMode.BATTALION_COMMS)
-            sendBattalionCommsMessage(clone, e.getMessage());
-        else if (chatMode == ChatMode.OUT_OF_CHARACTER)
-            sendMessage(ChatColor.WHITE + "[OOC] " + nameAndMessage, MessageType.OOC);
-        else if (chatMode == ChatMode.SERVER_COMMS)
-            sendMessage(ChatColor.DARK_GREEN + "[Communications] " + nameAndMessage, MessageType.SERVER_COMMS);
-        else if (chatMode == ChatMode.STAFF)
-            sendStaffMessage(ChatColor.LIGHT_PURPLE + "[Staff] " + nameAndMessage);
-        else if (chatMode == ChatMode.OFFICER)
-            sendOfficerMessage(ChatColor.DARK_PURPLE + "[Officer] " + nameAndMessage);
-        else if (chatMode == ChatMode.BROADCAST)
-            sendMessage(ChatColor.RED + "[Broadcast] " + nameAndMessage, MessageType.BROADCAST);
+            sendMessage(wholeMessage, clone.getBattalion().getOnlineClonesInPlayerForm(), chatMode);
+        else if (chatMode == ChatMode.STAFF || chatMode == ChatMode.OFFICER)
+            sendPermissionMessage(wholeMessage, chatModePermissions.get(chatMode));
+        else
+            sendMessage(wholeMessage, new ArrayList<>(Bukkit.getOnlinePlayers()), chatMode);
     }
 
-    public void sendLocalMessage(String nameAndMessage, Clone clone) {
-        GroupMessage.sendGroupMessage(ChatColor.YELLOW + "[Local] " + nameAndMessage, getLocalPlayers(clone.getPlayer().getLocation()), MessageType.LOCAL);
+    public Boolean cloneDoesNotHavePermissionForChatMode(Clone clone, ChatMode chatMode) {
+        if (!clone.hasPermission(chatModePermissions.get(chatMode))) {
+            clone.sendMessage(ChatColor.RED + "You do not have permission for the chat " + ChatColor.WHITE + chatMode.name().toLowerCase() + ChatColor.RED + "!");
+            return true;
+        }
+        return false;
     }
 
-    public void sendBattalionCommsMessage(Clone clone, String message) {
-        clone.getBattalion().sendBattalionCommsMessage(clone, message);
+    public void sendPermissionMessage(String wholeMessage, String permission) {
+        Bukkit.broadcast(wholeMessage, permission);
     }
 
-    public void sendStaffMessage(String prefixNameAndMessage) {
-        Bukkit.broadcast(prefixNameAndMessage, "CWB.staffChat");
-    }
-
-    public void sendOfficerMessage(String prefixNameAndMessage) {
-        Bukkit.broadcast(prefixNameAndMessage, "CWB.officerChat");
-    }
-
-    public void sendMessage(String prefixNameAndMessage, MessageType messageType) {
-        GroupMessage.sendGroupMessage(prefixNameAndMessage, new ArrayList<>(Bukkit.getOnlinePlayers()), messageType);
+    public void sendMessage(String wholeMessage, List<Player> players, ChatMode chatMode) {
+        GroupMessage.sendGroupMessage(wholeMessage, players, chatMode);
     }
 
     private List<Player> getLocalPlayers(Location loc) {

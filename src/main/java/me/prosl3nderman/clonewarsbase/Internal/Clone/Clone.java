@@ -178,20 +178,14 @@ public class Clone {
         });
     }
 
-    public void toggleBattalionComms() {
-        if (chatMode == ChatMode.BATTALION_COMMS)
-            toggleBattalionComms("off");
-        else
-            toggleBattalionComms("on");
-    }
-
-    public void toggleBattalionComms(String toggleStatus) {
-        if (toggleStatus.equalsIgnoreCase("on")) {
-            chatMode = ChatMode.BATTALION_COMMS;
-            sendMessage(ChatColor.DARK_GREEN + "Battalion communications has been toggled " + ChatColor.GREEN + "on" + ChatColor.DARK_GREEN + "!");
-        } else {
+    public void toggleChatMode(ChatMode chatModeToToggle) {
+        if (getChatMode() == chatModeToToggle) {
             chatMode = ChatMode.LOCAL;
-            sendMessage(ChatColor.DARK_GREEN + "Battalion communications has been toggled " + ChatColor.RED + "off" + ChatColor.DARK_GREEN + "!");
+            sendMessage(ChatColor.DARK_GREEN + "You have toggled " + ChatColor.RED + "off " + ChatColor.WHITE + chatModeToToggle.name().toLowerCase() + ChatColor.DARK_GREEN + " chat!");
+            sendMessage(ChatColor.DARK_GREEN + "The chat " + ChatColor.WHITE + "local" + ChatColor.DARK_GREEN + " has been toggled on!");
+        } else {
+            chatMode = chatModeToToggle;
+            sendMessage(ChatColor.DARK_GREEN + "You have toggled " + ChatColor.GREEN + "on " + ChatColor.WHITE + chatModeToToggle.name().toLowerCase() + ChatColor.DARK_GREEN + " chat!");
         }
     }
 

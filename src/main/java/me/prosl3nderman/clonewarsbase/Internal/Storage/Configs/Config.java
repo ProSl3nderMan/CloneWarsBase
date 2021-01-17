@@ -15,7 +15,7 @@ public class Config {
     private CloneWarsBase plugin;
     private FileConfiguration customConfig = null;
     private File customConfigFile = null;
-    private String dir; // = plugin.getDataFolder() + File.separator + "maps";
+    private String dir;
     private String configName;
 
     @Inject

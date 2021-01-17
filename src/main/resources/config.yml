@@ -4,11 +4,25 @@ MySQLDatabase:
   database: 'CloneWarsBase'
   username: 'username'
   password: 'password'
-chatShortcuts:
-  ooc: ''
-  staff: ''
-  officer: ''
-  server: ''
-  batt: ''
-  broadcast: ''
-  local: ''
+chatModes:
+  out_of_character:
+    prefix: '&f[White]'
+    permission: 'CWB.ooc_chat'
+  staff:
+    prefix: '&d[Staff]'
+    permission: 'CWB.staff_chat'
+  officer:
+    prefix: '&5[Officer]'
+    permission: 'CWB.officer_chat'
+  server_comms:
+    prefix: '&2[Communications]'
+    permission: 'CWB.server_comms_chat'
+  battalion_comms:
+    prefix: '&1[Battalion]'
+    permission: 'CWB.battalion_comms_chat'
+  broadcast:
+    prefix: '&c[Broadcast]'
+    permission: 'CWB.broadcast_chat'
+  local:
+    prefix: '&e[Local]'
+    permission: 'CWB.local_chat'

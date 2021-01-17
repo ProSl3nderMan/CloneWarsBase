@@ -10,3 +10,21 @@ commands:
   batt:
     description: Battalion command.
     aliases: [battalion]
+  ooc:
+    description: Out of character chat command.
+  staffChat:
+    description: Staff chat command.
+    aliases: [sc]
+  officerChat:
+    description: Officer chat command.
+    aliases: [oc]
+  battComms:
+    description: Battalion communication chat command.
+    aliases: [bc]
+  comms:
+    description: Server communication chat command.
+  broadcast:
+    description: Broadcast chat command.
+  local:
+    description: Local chat command.
+    aliases: [l]

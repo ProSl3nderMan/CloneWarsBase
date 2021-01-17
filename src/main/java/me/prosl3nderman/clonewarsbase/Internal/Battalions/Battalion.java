@@ -1,15 +1,16 @@
 package me.prosl3nderman.clonewarsbase.Internal.Battalions;
 
+import me.prosl3nderman.clonewarsbase.Internal.Chat.ChatMode;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.Config;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.ConfigHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Clone.Clone;
 import me.prosl3nderman.clonewarsbase.Internal.Wrappers.ProLocation;
 import me.prosl3nderman.clonewarsbase.Internal.Chat.GroupMessage;
 import me.prosl3nderman.clonewarsbase.Util.LocationStringConverter;
-import me.prosl3nderman.clonewarsbase.Internal.Chat.MessageType;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -54,42 +55,41 @@ public class Battalion {
         return onlineClones;
     }
 
+    public List<Player> getOnlineClonesInPlayerForm() {
+        List<Player> onlineClonesInPlayerForm = new ArrayList<>();
+        onlineClones.forEach(clone -> onlineClonesInPlayerForm.add(clone.getPlayer()));
+        return onlineClonesInPlayerForm;
+    }
+
     public void battalionsCloneCameOnline(Clone clone) {
         onlineClones.add(clone);
         GroupMessage.sendCloneGroupMessage(color + "" + ChatColor.BOLD + clone.getRank() + " " + clone.getName()
-                        + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " has joined.",
-                onlineClones, MessageType.BATTALION_JOIN_LEAVE);
+                        + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " has joined.", onlineClones, ChatMode.BATTALION_COMMS);
     }
 
     public void battalionsCloneWentOffline(Clone clone) {
         onlineClones.remove(clone);
         GroupMessage.sendCloneGroupMessage(color + "" + ChatColor.BOLD + clone.getRank() + " " + clone.getName()
-                        + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " has left.",
-                onlineClones, MessageType.BATTALION_JOIN_LEAVE);
-    }
-
-    public void sendBattalionCommsMessage(Clone clone, String message) {
-        GroupMessage.sendCloneGroupMessage(ChatColor.DARK_BLUE + "[BATT COMMS] " + clone.getColoredRank() + " " + clone.getName() + ChatColor.GOLD + ": "
-                        + ChatColor.GREEN + message,
-                onlineClones, MessageType.BATTALION_CHAT);
+                        + ChatColor.DARK_AQUA + "" + ChatColor.BOLD + " has left.", onlineClones, ChatMode.BATTALION_COMMS);
     }
 
     public void cloneRankedUp(Clone clone, String rank) {
         if (!onlineClones.contains(clone))
             onlineClones.add(clone);
         ChatColor bc = color; ChatColor bo = ChatColor.BOLD; ChatColor wh = ChatColor.WHITE;
-        GroupMessage.sendCloneGroupMessage(bc + "" + bo + "Congrats to " + wh + bo + clone.getName() + bc + bo + " for rank " + wh + bo + rank.toUpperCase() + bc + bo + "!",
-                onlineClones, MessageType.BATTALION_CHAT);
+        GroupMessage.sendCloneGroupMessage(bc + "" + bo + "Congrats to " + wh + bo + clone.getName() + bc + bo + " for rank " + wh + bo + rank.toUpperCase() + bc + bo + "!"
+                , onlineClones, ChatMode.BATTALION_COMMS);
     }
 
     public void removeCloneFromBattalion(Clone clone, String removalMessage) {
         ChatColor bo = ChatColor.BOLD;
-        GroupMessage.sendCloneGroupMessage(getColor() + "" + bo + clone.getRank() + " " + clone.getName() + " " + ChatColor.WHITE + ChatColor.BOLD + removalMessage, onlineClones, MessageType.BATTALION_CHAT);
+        GroupMessage.sendCloneGroupMessage(getColor() + "" + bo + clone.getRank() + " " + clone.getName() + " " + ChatColor.WHITE + ChatColor.BOLD + removalMessage
+                , onlineClones, ChatMode.BATTALION_COMMS);
         onlineClones.remove(clone);
     }
 
     public void removeCloneFromBattalion(String clone, String removalMessage) {
-        GroupMessage.sendCloneGroupMessage(getColor() + clone + " " + ChatColor.WHITE + ChatColor.BOLD + removalMessage, onlineClones, MessageType.BATTALION_CHAT);
+        GroupMessage.sendCloneGroupMessage(getColor() + clone + " " + ChatColor.WHITE + ChatColor.BOLD + removalMessage, onlineClones, ChatMode.BATTALION_COMMS);
     }
 
     public void silentCloneJoin(Clone clone) {

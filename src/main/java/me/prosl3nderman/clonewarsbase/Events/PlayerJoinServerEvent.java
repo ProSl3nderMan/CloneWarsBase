@@ -51,17 +51,20 @@ public class PlayerJoinServerEvent implements Listener {
     @EventHandler
     public void onPlayerJoinServerEvent(PlayerJoinEvent event) {
         cloneHandler.loadClone(event.getPlayer());
+
+        Battalion battalion = playerBattalions.get(event.getPlayer().getUniqueId());
+        String rank = playerRanks.get(event.getPlayer().getUniqueId());
+        skinAPI.applyCloneSkin(event.getPlayer(), battalion, rank);
+
+        playerRanks.remove(event.getPlayer().getUniqueId());
+        playerBattalions.remove(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public void onPlayerSpawnEvent(PlayerSpawnLocationEvent event) {
         Battalion battalion = playerBattalions.get(event.getPlayer().getUniqueId());
-        String rank = playerRanks.get(event.getPlayer().getUniqueId());
-        skinAPI.applyCloneSkin(event.getPlayer(), battalion, rank);
 
         event.setSpawnLocation(battalion.getSpawnPoint());
 
-        playerRanks.remove(event.getPlayer().getUniqueId());
-        playerBattalions.remove(event.getPlayer().getUniqueId());
     }
 }

@@ -2,11 +2,14 @@ package me.prosl3nderman.clonewarsbase;
 
 import com.google.inject.Injector;
 import me.prosl3nderman.clonewarsbase.Commands.BattalionCommand;
+import me.prosl3nderman.clonewarsbase.Commands.ChatCommands;
+import me.prosl3nderman.clonewarsbase.Events.AsyncChatEvent;
 import me.prosl3nderman.clonewarsbase.Events.MenuClickEvent;
 import me.prosl3nderman.clonewarsbase.Events.PlayerJoinServerEvent;
 import me.prosl3nderman.clonewarsbase.Events.PlayerLeaveServerEvent;
 import me.prosl3nderman.clonewarsbase.Internal.Battalions.BattalionHandler;
 import me.prosl3nderman.clonewarsbase.Commands.CWBCommand;
+import me.prosl3nderman.clonewarsbase.Internal.Chat.ChatHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Handler;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.ConfigHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Clone.CloneHandler;
@@ -37,6 +40,8 @@ public final class CloneWarsBase extends JavaPlugin {
     private ConfigHandler configHandler;
     @Inject
     private BattalionHandler battalionHandler;
+    @Inject
+    private ChatHandler chatHandler;
     @Inject
     private MySQLDatabase mySQLDatabase;
 
@@ -97,16 +102,26 @@ public final class CloneWarsBase extends JavaPlugin {
     private void registerCommands() {
         getCommand("CWB").setExecutor(injector.getInstance(CWBCommand.class));
         getCommand("batt").setExecutor(injector.getInstance(BattalionCommand.class));
+
+        ChatCommands chatCommands = injector.getInstance(ChatCommands.class);
+        getCommand("ooc").setExecutor(chatCommands);
+        getCommand("staffChat").setExecutor(chatCommands);
+        getCommand("officerChat").setExecutor(chatCommands);
+        getCommand("battComms").setExecutor(chatCommands);
+        getCommand("comms").setExecutor(chatCommands);
+        getCommand("broadcast").setExecutor(chatCommands);
+        getCommand("local").setExecutor(chatCommands);
     }
 
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(injector.getInstance(PlayerJoinServerEvent.class), this);
         getServer().getPluginManager().registerEvents(injector.getInstance(PlayerLeaveServerEvent.class), this);
         getServer().getPluginManager().registerEvents(injector.getInstance(MenuClickEvent.class), this);
+        getServer().getPluginManager().registerEvents(injector.getInstance(AsyncChatEvent.class), this);
     }
 
     private void enableHandlers() {
-        allHandlers.addAll(Arrays.asList(cloneHandler, configHandler, battalionHandler));
+        allHandlers.addAll(Arrays.asList(cloneHandler, configHandler, battalionHandler, chatHandler));
         for (Handler handler : allHandlers)
             handler.enable();
     }
@@ -142,7 +157,6 @@ public final class CloneWarsBase extends JavaPlugin {
             }
         } catch (Exception e) {
             e.printStackTrace();
-
         }
     }
 

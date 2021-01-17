@@ -4,6 +4,7 @@ import me.prosl3nderman.clonewarsbase.CloneWarsBase;
 import me.prosl3nderman.clonewarsbase.Internal.APIs.LuckPermsAPI;
 import me.prosl3nderman.clonewarsbase.Internal.Battalions.Battalion;
 import me.prosl3nderman.clonewarsbase.Internal.Battalions.BattalionHandler;
+import me.prosl3nderman.clonewarsbase.Internal.Chat.ChatMode;
 import me.prosl3nderman.clonewarsbase.Internal.Clone.Clone;
 import me.prosl3nderman.clonewarsbase.Internal.Clone.CloneHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Menus.ConfirmActionMenu;
@@ -77,7 +78,7 @@ public class BattalionCommand implements CommandExecutor {
         }
 
         if (subcommand.equalsIgnoreCase("chat") || subcommand.equalsIgnoreCase("c") || subcommand.equalsIgnoreCase("comms")) {
-            toggleBattalionComms(clone, args);
+            toggleBattalionComms(clone);
             return true;
         }
 
@@ -123,7 +124,7 @@ public class BattalionCommand implements CommandExecutor {
         clone.sendMessage(commandStarter + "list [battalion || clone]" + commandAndDescriptionSpacer + "Used to retrieve a list of all battalion members. If you give a clone name, it'll pull up their battalion's members.");
         clone.sendMessage(commandStarter + "join [battalion]" + commandAndDescriptionSpacer + "Used to join a battalion. If there are multiple invites, specify the battalion.");
         clone.sendMessage(commandStarter + "leave" + commandAndDescriptionSpacer + "Used to leave a battalion.");
-        clone.sendMessage(commandStarter + "<chat || c || comms> [on|off]" + commandAndDescriptionSpacer + "Used to toggle on/off battalion communications.");
+        clone.sendMessage(commandStarter + "<chat || c || comms> " + commandAndDescriptionSpacer + "Used to toggle on/off battalion communications.");
         //player.sendMessage(commandStarter + "" + commandAndDescriptionSpacer + "");
         if (clone.hasPermission(officerPermission)) {
             clone.sendMessage(titleColors + "Clone Status Commands " + lineSpacer);
@@ -238,17 +239,8 @@ public class BattalionCommand implements CommandExecutor {
         confirmActionMenu.openMenu(clone, "Leaving", clone.getName());
     }
 
-    private void toggleBattalionComms(Clone clone, String[] args) {
-        if (args.length > 1) {
-            String toggleStatus = args[1];
-            if (toggleStatus.equalsIgnoreCase("on") || toggleStatus.equalsIgnoreCase("off")) {
-                clone.toggleBattalionComms(toggleStatus);
-                return;
-            }
-            clone.sendMessage(rd + "Error! Toggle status must be " + wh + "on" + rd + " or " + wh + "off" + rd + "! You tried giving status: " + wh + toggleStatus + rd + "!");
-            clone.sendMessage(ChatColor.DARK_RED + "Continuing to default toggle command...");
-        }
-        clone.toggleBattalionComms();
+    private void toggleBattalionComms(Clone clone) {
+        clone.toggleChatMode(ChatMode.BATTALION_COMMS);
     }
 
     private Clone checkIfArgumentIsClone(Clone clone, String targetPlayerString) {

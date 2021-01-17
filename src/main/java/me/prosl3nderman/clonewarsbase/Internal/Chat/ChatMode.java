@@ -9,4 +9,5 @@ public enum ChatMode {
     BROADCAST,
     STAFF,
     OFFICER
+
 }

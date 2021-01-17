@@ -4,7 +4,6 @@ import com.google.inject.Injector;
 import me.prosl3nderman.clonewarsbase.CloneWarsBase;
 import me.prosl3nderman.clonewarsbase.Internal.APIs.SkinAPI;
 import me.prosl3nderman.clonewarsbase.Internal.Handler;
-import me.prosl3nderman.clonewarsbase.Internal.APIs.LuckPermsAPI;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.Config;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Configs.ConfigHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Storage.Database.MySQLDatabase;

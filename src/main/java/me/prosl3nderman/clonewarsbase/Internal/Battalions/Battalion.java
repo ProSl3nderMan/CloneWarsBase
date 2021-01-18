@@ -20,10 +20,12 @@ import java.util.List;
 public class Battalion {
 
     private ConfigHandler configHandler;
+    private BattalionHandler battalionHandler;
 
     @Inject
-    public Battalion(ConfigHandler configHandler) {
+    public Battalion(ConfigHandler configHandler, BattalionHandler battalionHandler) {
         this.configHandler = configHandler;
+        this.battalionHandler = battalionHandler;
     }
 
     private String name;
@@ -52,12 +54,21 @@ public class Battalion {
     }
 
     public List<Clone> getOnlineClones() {
+        List<Clone> onlineClones = this.onlineClones;
+        if (getName().equalsIgnoreCase("cr") || getName().equalsIgnoreCase("ct"))
+            onlineClones.addAll(battalionHandler.getBattalion(getName().equalsIgnoreCase("cr") ? "ct" : "cr").getJustBattalionsPlayers());
         return onlineClones;
+    }
+
+    public List<Clone> getJustBattalionsPlayers() {
+        return this.onlineClones;
     }
 
     public List<Player> getOnlineClonesInPlayerForm() {
         List<Player> onlineClonesInPlayerForm = new ArrayList<>();
         onlineClones.forEach(clone -> onlineClonesInPlayerForm.add(clone.getPlayer()));
+        if (getName().equalsIgnoreCase("cr") || getName().equalsIgnoreCase("ct"))
+            battalionHandler.getBattalion(getName().equalsIgnoreCase("cr") ? "ct" : "cr").getJustBattalionsPlayers().forEach(clone -> onlineClonesInPlayerForm.add(clone.getPlayer()));
         return onlineClonesInPlayerForm;
     }
 

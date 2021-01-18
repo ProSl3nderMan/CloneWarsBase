@@ -50,6 +50,7 @@ public class PlayerJoinServerEvent implements Listener {
 
     @EventHandler
     public void onPlayerJoinServerEvent(PlayerJoinEvent event) {
+        event.setJoinMessage("");
         cloneHandler.loadClone(event.getPlayer());
 
         Battalion battalion = playerBattalions.get(event.getPlayer().getUniqueId());

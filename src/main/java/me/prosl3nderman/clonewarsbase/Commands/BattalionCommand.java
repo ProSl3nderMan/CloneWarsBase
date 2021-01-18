@@ -194,7 +194,7 @@ public class BattalionCommand implements CommandExecutor {
                 Bukkit.getScheduler().runTask(plugin, new Runnable() {
                     @Override
                     public void run() {
-                        clone.sendMessage(wh + "All clones of battalion " + battalionColor + battalionName + wh + ": " + allClonesStringFinal);
+                        clone.sendMessage(wh + "All clones of battalion " + battalionColor + battalionName.toUpperCase() + wh + ": " + allClonesStringFinal);
                     }
                 });
             }

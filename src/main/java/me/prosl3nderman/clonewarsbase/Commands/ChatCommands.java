@@ -5,6 +5,7 @@ import me.prosl3nderman.clonewarsbase.Internal.Chat.ChatMode;
 import me.prosl3nderman.clonewarsbase.Internal.Clone.Clone;
 import me.prosl3nderman.clonewarsbase.Internal.Clone.CloneHandler;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.logging.Level;
 
 @Singleton
 public class ChatCommands implements CommandExecutor {
@@ -20,8 +22,9 @@ public class ChatCommands implements CommandExecutor {
     private ChatHandler chatHandler;
 
     @Inject
-    public ChatCommands(CloneHandler cloneHandler) {
+    public ChatCommands(CloneHandler cloneHandler, ChatHandler chatHandler) {
         this.cloneHandler = cloneHandler;
+        this.chatHandler = chatHandler;
     }
 
     private ChatColor rd = ChatColor.RED, wh = ChatColor.WHITE;
@@ -37,19 +40,19 @@ public class ChatCommands implements CommandExecutor {
 
         ChatMode chatMode = null;
 
-        if (playerUsedCommand.equalsIgnoreCase("ooc"))
+        if (command.getLabel().equalsIgnoreCase("ooc"))
             chatMode = ChatMode.OUT_OF_CHARACTER;
-        else if (playerUsedCommand.equalsIgnoreCase("staffChat"))
+        else if (command.getLabel().equalsIgnoreCase("staffChat"))
             chatMode = ChatMode.STAFF;
-        else if (playerUsedCommand.equalsIgnoreCase("officerChat"))
+        else if (command.getLabel().equalsIgnoreCase("officerChat"))
             chatMode = ChatMode.OFFICER;
-        else if (playerUsedCommand.equalsIgnoreCase("comms"))
+        else if (command.getLabel().equalsIgnoreCase("comms"))
             chatMode = ChatMode.SERVER_COMMS;
-        else if (playerUsedCommand.equalsIgnoreCase("battComms"))
+        else if (command.getLabel().equalsIgnoreCase("battComms"))
             chatMode = ChatMode.BATTALION_COMMS;
-        else if (playerUsedCommand.equalsIgnoreCase("broadcast"))
+        else if (command.getLabel().equalsIgnoreCase("broadcast"))
             chatMode = ChatMode.BROADCAST;
-        else if (playerUsedCommand.equalsIgnoreCase("local"))
+        else if (command.getLabel().equalsIgnoreCase("local"))
             chatMode = ChatMode.LOCAL;
 
         chatCommand(clone, args, chatMode);
@@ -67,7 +70,7 @@ public class ChatCommands implements CommandExecutor {
             String message = args[0];
             for (int i = 1; i < args.length; i++)
                 message += " " + args[i];
-            
+
             chatHandler.handleChatMessage(clone, message, chatMode);
         }
     }

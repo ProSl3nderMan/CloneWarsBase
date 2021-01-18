@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 public class TabAPI {
 
-    public void setPlayersBelowNameTitle(String rankTitle, Player player) {
+    public void setPlayersAboveNameTitle(String rankTitle, Player player) {
         TABAPI.getPlayer(player.getUniqueId()).setValueTemporarily(EnumProperty.ABOVENAME, rankTitle);
     }
 

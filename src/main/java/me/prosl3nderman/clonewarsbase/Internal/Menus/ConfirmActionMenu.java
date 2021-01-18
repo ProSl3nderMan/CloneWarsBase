@@ -67,12 +67,20 @@ public class ConfirmActionMenu {
 
         ItemStack item = event.getCurrentItem();
         if (item.getType() == Material.GREEN_STAINED_GLASS_PANE) {
-            Player targetClonePlayer = Bukkit.getPlayer(ChatColor.stripColor(item.getItemMeta().getLore().get(0).split(": ")[1]));
+            String targetPlayerName = ChatColor.stripColor(item.getItemMeta().getLore().get(0).split(": ")[1]);
+            Player targetClonePlayer = Bukkit.getPlayer(targetPlayerName);
             if (targetClonePlayer == null || !targetClonePlayer.isOnline()) { //offline clone kick
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
                     @Override
                     public void run() {
                         mySQLDatabase.removePlayerFromBattalion(ChatColor.stripColor(item.getItemMeta().getLore().get(0).split(": ")[1]));
+                        Bukkit.getScheduler().runTask(plugin, new Runnable() {
+                            @Override
+                            public void run() {
+                                Clone clone = cloneHandler.getClone(event.getWhoClicked().getUniqueId());
+                                clone.getBattalion().removeCloneFromBattalion(targetPlayerName, "has been kicked from the battalion!");
+                            }
+                        });
                     }
                 });
             } else {

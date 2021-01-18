@@ -4,6 +4,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 import me.prosl3nderman.clonewarsbase.CloneWarsBase;
 import me.prosl3nderman.clonewarsbase.Internal.Battalions.BattalionHandler;
+import me.prosl3nderman.clonewarsbase.Internal.Chat.ChatHandler;
 import me.prosl3nderman.clonewarsbase.Internal.Handler;
 
 import javax.inject.Inject;
@@ -17,12 +18,14 @@ public class ConfigHandler implements Handler {
     private Injector injector;
     private CloneWarsBase plugin;
     private Provider<BattalionHandler> battalionHandlerProvider;
+    private Provider<ChatHandler> chatHandlerProvider;
 
     @Inject
-    public ConfigHandler(Injector injector, CloneWarsBase plugin, Provider<BattalionHandler> battalionHandlerProvider) {
+    public ConfigHandler(Injector injector, CloneWarsBase plugin, Provider<BattalionHandler> battalionHandlerProvider, Provider<ChatHandler> chatHandlerProvider) {
         this.injector = injector;
         this.plugin = plugin;
         this.battalionHandlerProvider = battalionHandlerProvider;
+        this.chatHandlerProvider = chatHandlerProvider;
     }
 
     private HashMap<String, Config> loadedConfigs = new HashMap<>();
@@ -112,5 +115,7 @@ public class ConfigHandler implements Handler {
 
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
+
+        chatHandlerProvider.get().loadPrefixsAndPermissions();
     }
 }

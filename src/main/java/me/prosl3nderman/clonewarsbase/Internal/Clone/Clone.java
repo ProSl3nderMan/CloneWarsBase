@@ -104,9 +104,9 @@ public class Clone {
     public String getRankTitle() {
         return battalion.getName().equalsIgnoreCase("cr") || battalion.getName().equalsIgnoreCase("ct")
                 ?
-                battalion.getColor() + getRank().toUpperCase() + " " + cloneID + " "
+                battalion.getColor() + getRank().toUpperCase() + " " + cloneID
                 :
-                battalion.getColor() + battalion.getAbbreviatedName() + " " + getRank().toUpperCase() + " ";
+                battalion.getColor() + battalion.getAbbreviatedName() + " " + getRank().toUpperCase();
     }
     
     public Battalion getBattalion() {
@@ -120,8 +120,8 @@ public class Clone {
     }
 
     public void updateTags() {
-        tabAPI.setPlayersBelowNameTitle(getRankTitle(), getPlayer());
-        tabAPI.setPlayersTabTitle(getRankTitle() + "| " + name, getPlayer());
+        tabAPI.setPlayersAboveNameTitle(getRankTitle(), getPlayer());
+        tabAPI.setPlayersTabTitle(getRankTitle() + " | " + name, getPlayer());
         tabAPI.setPlayersNameColor(battalion.getColor(), getPlayer());
     }
 

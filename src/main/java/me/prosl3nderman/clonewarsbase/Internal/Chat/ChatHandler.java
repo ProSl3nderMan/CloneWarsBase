@@ -34,8 +34,12 @@ public class ChatHandler implements Handler {
 
     @Override
     public void enable() {
+        loadPrefixsAndPermissions();
+    }
+
+    public void loadPrefixsAndPermissions() {
         for (ChatMode chatMode : ChatMode.values()) {
-            String pathToChatMode = "chat." + chatMode.name().toLowerCase() + ".";
+            String pathToChatMode = "chatModes." + chatMode.name().toLowerCase() + ".";
             chatModePrefixs.put(chatMode, ChatColor.translateAlternateColorCodes('&',plugin.getConfig().getString(pathToChatMode + "prefix")));
             chatModePermissions.put(chatMode, plugin.getConfig().getString(pathToChatMode + "permission"));
         }
@@ -54,7 +58,7 @@ public class ChatHandler implements Handler {
     }
 
     public void handleChatMessage(Clone clone, String message, ChatMode chatMode) {
-        String wholeMessage = chatModePrefixs.get(chatMode) + " " + clone.getBattalion().getColoredAbbreviatedName() + " " + clone.getColoredRank() + " " + clone.getName() + ChatColor.WHITE + ": " + message;
+        String wholeMessage = chatModePrefixs.get(chatMode) + " " + clone.getRankTitle() + " " + clone.getName() + ChatColor.WHITE + ": " + message;
 
         if (chatMode == ChatMode.LOCAL)
             sendMessage(wholeMessage, getLocalPlayers(clone.getPlayer().getLocation()), chatMode);

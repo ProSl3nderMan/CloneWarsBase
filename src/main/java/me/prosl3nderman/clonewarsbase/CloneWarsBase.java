@@ -4,6 +4,7 @@ import com.google.inject.Injector;
 import me.prosl3nderman.clonewarsbase.Commands.BattalionCommand;
 import me.prosl3nderman.clonewarsbase.Commands.ChatCommands;
 import me.prosl3nderman.clonewarsbase.Events.AsyncChatEvent;
+import me.prosl3nderman.clonewarsbase.Events.CrackShot.WeaponFiredEvent;
 import me.prosl3nderman.clonewarsbase.Events.MenuClickEvent;
 import me.prosl3nderman.clonewarsbase.Events.PlayerJoinServerEvent;
 import me.prosl3nderman.clonewarsbase.Events.PlayerLeaveServerEvent;
@@ -118,6 +119,7 @@ public final class CloneWarsBase extends JavaPlugin {
         getServer().getPluginManager().registerEvents(injector.getInstance(PlayerLeaveServerEvent.class), this);
         getServer().getPluginManager().registerEvents(injector.getInstance(MenuClickEvent.class), this);
         getServer().getPluginManager().registerEvents(injector.getInstance(AsyncChatEvent.class), this);
+        getServer().getPluginManager().registerEvents(injector.getInstance(WeaponFiredEvent.class), this);
     }
 
     private void enableHandlers() {

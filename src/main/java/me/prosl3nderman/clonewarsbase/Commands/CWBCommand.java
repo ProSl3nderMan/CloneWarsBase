@@ -45,6 +45,9 @@ public class CWBCommand implements CommandExecutor {
     private ChatColor wh = ChatColor.WHITE;
     private ChatColor rd = ChatColor.RED;
 
+    public Double testRecoil = 0.0000001;
+    public Double testFallRecoil = .4;
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
@@ -109,6 +112,16 @@ public class CWBCommand implements CommandExecutor {
             customSkins.createSkin("cr", new File(plugin.getDataFolder() + fs + "battalions" + fs + "cr" + fs, "cr.png"), "private", "steve", true);
             customSkins.applySkin("cr", playerSender.getName());
             playerSender.sendMessage(ChatColor.GREEN + "Skin set to cr! - ProSl3nderMan");
+            return true;
+        }
+
+        if (subcommand.equalsIgnoreCase("testRecoil")) {
+            testRecoil = Double.parseDouble(args[1]);
+            return true;
+        }
+
+        if (subcommand.equalsIgnoreCase("testFallRecoil")) {
+            testFallRecoil = Double.parseDouble(args[1]);
             return true;
         }
 

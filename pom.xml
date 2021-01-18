@@ -134,5 +134,11 @@
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>me.ProSl3nderMan.CrackShot</groupId>
+            <artifactId>CrackShot</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>
